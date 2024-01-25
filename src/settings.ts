@@ -102,3 +102,8 @@ app.post('/videos', (req: RequestWithBody<ICreateVideoReq>, res) => {
 
   res.status(201).send(newVideo)
 })
+
+app.delete('/testing/all-data', (req, res) => {
+  videos.length = 0
+  res.sendStatus(204)
+})

@@ -59,6 +59,7 @@ videosRouter.post('/', (req: RequestWithBody<ICreateVideoReq>, res) => {
 
 videosRouter.put('/:id', (req: RequestParamsBody<IUpdateVideoReq>, res) => {
   const id = +req.params.id
+
   const {
     title,
     author,
@@ -78,14 +79,23 @@ videosRouter.put('/:id', (req: RequestParamsBody<IUpdateVideoReq>, res) => {
 
   videos.forEach((video) => {
     if (video.id === id) {
-      video.title = title
-      video.author = author
-      video.availableResolutions = availableResolutions
-      canBeDownloaded && (video.canBeDownloaded = canBeDownloaded)
-      minAgeRestriction && (video.minAgeRestriction = minAgeRestriction)
-      publicationDate && (video.publicationDate = publicationDate)
+
     }
   })
+
+  const video = videos.find(video => video.id === id)
+
+  if (!video) {
+    res.sendStatus(404)
+    return
+  }
+
+  video.title = title
+  video.author = author
+  video.availableResolutions = availableResolutions
+  canBeDownloaded && (video.canBeDownloaded = canBeDownloaded)
+  minAgeRestriction && (video.minAgeRestriction = minAgeRestriction)
+  publicationDate && (video.publicationDate = publicationDate)
 
   res.sendStatus(204)
 })
@@ -94,8 +104,10 @@ videosRouter.delete('/:id', (req: RequestWithParams, res) => {
   const id = +req.params.id
 
   const indexVideo = videos.findIndex((video) => video.id === id)
+
   if (indexVideo === -1) {
     res.sendStatus(404)
+    return
   }
 
   videos.splice(indexVideo, 1)

@@ -83,6 +83,12 @@ videosRouter.put('/:id', (req: RequestParamsBody<IUpdateVideoReq>, res) => {
       message: 'Invalid canBeDownloaded'
     })
   }
+  if (typeof publicationDate !== 'string') {
+    errors.errorsMessages.push({
+      field: 'publicationDate',
+      message: 'Invalid publicationDate'
+    })
+  }
 
   if (errors.errorsMessages.length) {
     res.status(400).send(errors)

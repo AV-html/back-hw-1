@@ -84,6 +84,11 @@ videosRouter.put('/:id', (req: RequestParamsBody<IUpdateVideoReq>, res) => {
     })
   }
 
+  if (errors.errorsMessages.length) {
+    res.status(400).send(errors)
+    return
+  }
+
   const video = videos.find(video => video.id === id)
 
   if (!video) {

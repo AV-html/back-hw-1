@@ -1,6 +1,14 @@
 import { Router } from "express";
-import { ICreateVideoReq, IErrors, IVideoDbType, RequestWithBody, RequestWithParams } from "../types";
-import { ResolutionsList, videos } from "../settings";
+import {
+  ICreateVideoReq,
+  IUpdateVideoReq,
+  IVideoDbType,
+  RequestParamsBody,
+  RequestWithBody,
+  RequestWithParams
+} from "../types";
+import { videos } from "../settings";
+import { validationVideo } from "../validators";
 
 export const videosRouter = Router({})
 
@@ -20,37 +28,9 @@ videosRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res) => {
 })
 
 videosRouter.post('/', (req: RequestWithBody<ICreateVideoReq>, res) => {
-  const errors: IErrors = {
-    errorMessages: []
-  }
+  const {title, author, availableResolutions = []} = req.body
 
-  const {title, author, availableResolutions} = req.body
-
-  if (!title || typeof title !== 'string' || !title.trim() || title.trim().length > 40) {
-    errors.errorMessages.push({
-      field: 'title',
-      message: 'Invalid title'
-    })
-  }
-
-  if (!author || typeof author !== 'string' || !author.trim() || author.trim().length > 20) {
-    errors.errorMessages.push({
-      field: 'author',
-      message: 'Invalid author'
-    })
-  }
-
-  let totalAvailableResolutions = availableResolutions
-  if (availableResolutions && Array.isArray(availableResolutions)) {
-    availableResolutions.forEach((resolution) => {
-      !ResolutionsList.includes(resolution) && errors.errorMessages.push({
-        field: 'availableResolutions',
-        message: `Invalid resolution ${resolution}!`
-      })
-    })
-  } else {
-    totalAvailableResolutions = []
-  }
+  const errors = validationVideo(title, author, availableResolutions)
 
   if (errors.errorMessages.length) {
     res.status(400).send(errors)
@@ -63,10 +43,10 @@ videosRouter.post('/', (req: RequestWithBody<ICreateVideoReq>, res) => {
 
   const newVideo: IVideoDbType = {
     id: +publicationDate,
-    availableResolutions: totalAvailableResolutions,
+    availableResolutions,
     canBeDownloaded: false,
     createdAt: createdAt.toISOString(),
-    minAgeRegistration: null,
+    minAgeRestriction: null,
     publicationDate: publicationDate.toISOString(),
     title,
     author,
@@ -75,4 +55,50 @@ videosRouter.post('/', (req: RequestWithBody<ICreateVideoReq>, res) => {
   videos.push(newVideo)
 
   res.status(201).send(newVideo)
+})
+
+videosRouter.put('/:id', (req: RequestParamsBody<IUpdateVideoReq>, res) => {
+  const id = +req.params.id
+  const {
+    title,
+    author,
+    availableResolutions = [],
+    canBeDownloaded,
+    minAgeRestriction,
+    publicationDate
+  } = req.body
+
+  const errors = validationVideo(title, author, availableResolutions)
+  if (!minAgeRestriction || typeof minAgeRestriction !== 'number' || minAgeRestriction > 18 || minAgeRestriction < 1) {
+    errors.errorMessages.push({
+      field: 'minAgeRestriction',
+      message: 'Invalid author'
+    })
+  }
+
+  videos.forEach((video) => {
+    if (video.id === id) {
+      video.title = title
+      video.author = author
+      video.availableResolutions = availableResolutions
+      canBeDownloaded && (video.canBeDownloaded = canBeDownloaded)
+      minAgeRestriction && (video.minAgeRestriction = minAgeRestriction)
+      publicationDate && (video.publicationDate = publicationDate)
+    }
+  })
+
+  res.sendStatus(204)
+})
+
+videosRouter.delete('/:id', (req: RequestWithParams, res) => {
+  const id = +req.params.id
+
+  const indexVideo = videos.findIndex((video) => video.id === id)
+  if (!indexVideo) {
+    res.sendStatus(404)
+  }
+
+  videos.splice(indexVideo, 1)
+
+  res.sendStatus(204)
 })

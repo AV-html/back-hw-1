@@ -8,7 +8,7 @@ export interface IVideoDbType {
   title: string
   author: string
   canBeDownloaded: boolean
-  minAgeRegistration: number | null
+  minAgeRestriction: number | null
   createdAt: string
   publicationDate: string
   availableResolutions: TResolutionsArray
@@ -17,7 +17,16 @@ export interface IVideoDbType {
 export interface ICreateVideoReq {
   title: string
   author: string
-  availableResolutions: TResolutionsArray
+  availableResolutions?: TResolutionsArray
+}
+
+export interface IUpdateVideoReq {
+  title: string,
+  author: string,
+  availableResolutions?: TResolutionsArray,
+  canBeDownloaded?: boolean,
+  minAgeRestriction?: number,
+  publicationDate?: string
 }
 
 export interface IErrorMessage {
@@ -28,5 +37,7 @@ export interface IErrors {
   errorMessages: IErrorMessage[]
 }
 
-export type RequestWithParams<P> = Request<P, {}, {}, {}>
+export type RequestWithParams<P = {id: string}> = Request<P, {}, {}, {}>
 export type RequestWithBody<B> = Request<{}, {}, B, {}>
+
+export type RequestParamsBody<B, P = {id: string}> = Request<P, {}, B, {}>

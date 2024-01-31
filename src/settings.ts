@@ -22,7 +22,7 @@ export const videos: IVideoDbType[] = [
     title: '',
     author: '',
     canBeDownloaded: true,
-    minAgeRegistration: null,
+    minAgeRestriction: null,
     createdAt: '2023-12-04T16:26:14.200Z',
     publicationDate: '2023-12-04T16:26:14.200Z',
     availableResolutions: [

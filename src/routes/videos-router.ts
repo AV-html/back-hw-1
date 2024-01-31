@@ -70,18 +70,19 @@ videosRouter.put('/:id', (req: RequestParamsBody<IUpdateVideoReq>, res) => {
   } = req.body
 
   const errors = validationVideo(title, author, availableResolutions)
+
   if (!minAgeRestriction || typeof minAgeRestriction !== 'number' || minAgeRestriction > 18 || minAgeRestriction < 1) {
     errors.errorsMessages.push({
       field: 'minAgeRestriction',
-      message: 'Invalid author'
+      message: 'Invalid minAgeRestriction'
     })
   }
-
-  videos.forEach((video) => {
-    if (video.id === id) {
-
-    }
-  })
+  if (typeof canBeDownloaded !== 'boolean') {
+    errors.errorsMessages.push({
+      field: 'canBeDownloaded',
+      message: 'Invalid canBeDownloaded'
+    })
+  }
 
   const video = videos.find(video => video.id === id)
 

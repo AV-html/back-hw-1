@@ -34,7 +34,7 @@ export interface IErrorMessage {
   field: string
 }
 export interface IErrors {
-  errorMessages: IErrorMessage[]
+  errorsMessages: IErrorMessage[]
 }
 
 export type RequestWithParams<P = {id: string}> = Request<P, {}, {}, {}>

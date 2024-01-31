@@ -32,7 +32,7 @@ videosRouter.post('/', (req: RequestWithBody<ICreateVideoReq>, res) => {
 
   const errors = validationVideo(title, author, availableResolutions)
 
-  if (errors.errorMessages.length) {
+  if (errors.errorsMessages.length) {
     res.status(400).send(errors)
     return
   }
@@ -70,7 +70,7 @@ videosRouter.put('/:id', (req: RequestParamsBody<IUpdateVideoReq>, res) => {
 
   const errors = validationVideo(title, author, availableResolutions)
   if (!minAgeRestriction || typeof minAgeRestriction !== 'number' || minAgeRestriction > 18 || minAgeRestriction < 1) {
-    errors.errorMessages.push({
+    errors.errorsMessages.push({
       field: 'minAgeRestriction',
       message: 'Invalid author'
     })
@@ -94,7 +94,7 @@ videosRouter.delete('/:id', (req: RequestWithParams, res) => {
   const id = +req.params.id
 
   const indexVideo = videos.findIndex((video) => video.id === id)
-  if (!indexVideo) {
+  if (indexVideo === -1) {
     res.sendStatus(404)
   }
 
